@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4 way api call</title>
+    <style>
+        .box .images {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .box .images img {
+            width: 150px;
+            height: 150px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.3/axios.min.js" integrity="sha512-JWQFV6OCC2o2x8x46YrEeFEQtzoNV++r9im8O8stv91YwHNykzIS2TbvAlFdeH0GVlpnyd79W0ZGmffcRi++Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const box = document.querySelector('.box');
+
+        // first-------fetch api------------------------------------------------------------
+        fetch('https://dummyjson.com/products').then((res) => {
+            return res.json();
+        }).then((data) => {
+            const apiData = data.products;
+            console.log(apiData, 'apiData');
+            let htmlStr = "";
+            apiData.forEach((ele) => {
+                htmlStr += `
+                        <h1>fetch  Api</h1>
+                    <h2>Brand : ${ele.brand}</h2>
+                    <div class="images">
+                    </div>
+                `
+            })
+            box.innerHTML = htmlStr;
+
+            let imagesBox = document.querySelectorAll('.images');
+            console.log(imagesBox, 'imagesBox');
+            apiData.forEach((ele, index) => {
+                ele.images.forEach((item) => {
+                    imagesBox.forEach((imgBox, idx) => {
+                        if (idx === index) {
+                            imgBox.innerHTML += `
+                    <img src="${item}" alt="img1">
+                    `
+                        }
+                    })
+
+                })
+            })
+        })
+
+
+        // -------fetch api------------------------------------------------------------
+        fetch('https://dummyjson.com/products').then((res)=>{
+            return res.json()
+        }).then((data)=>{
+            console.log(data,'data_______________fetch method');
+        })
+        
+        // second-------async await-----------------------------------------------------
+
+        const apiData = async () => {
+            const responce = await fetch('https://dummyjson.com/products');
+            const res = await responce.json();
+            console.log(res,'res_______________async await'); 
+        }
+        apiData();
+
+        // third-------XHR-----------------------------------------------------
+        const request = new XMLHttpRequest()
+        request.open('GET' , 'https://dummyjson.com/products');
+        request.send();
+        request.onload = () => {
+            console.log(request , 'request_____________')   
+            if(request.status === 200){
+                const data = JSON.parse(request.response);
+                console.log(data,'data_______________XHR method');
+                
+            }else{
+                console.log(request.status);
+            }
+        }
+
+        // best way to call XHR + PROMISE ------------------------------------------
+
+        function apiCall(method, url, data) {
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (this.readyState === 4) {
+                        switch (this.status) {
+                            case 200:
+                                resolve(this.responseText);
+                                break;
+                            default:
+                                reject(this.responseText);
+                        }
+                    }
+                }
+                xhr.open(method, url);
+                xhr.send(data);
+            });
+        };
+
+        apiCall('GET' , 'https://dummyjson.com/products' ).then((data) => {
+            console.log(data,'data xhr + promise');
+        })
+
+
+        // fourth-------axios-----------------------------------------------------
+
+        axios.get('https://dummyjson.com/products').then((res)=>{
+            const data = res.data;
+            console.log(data,'data____________axios');
+        }, ()=>{
+            console.log('ERROR________________')    
+        })
+        
+        
+        </script>
+</body>
+
+</html>
